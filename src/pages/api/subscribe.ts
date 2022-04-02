@@ -2,7 +2,7 @@ import {NextApiRequest, NextApiResponse} from 'next'
 import {stripe} from '../../services/stripe'
 import {fauna} from '../../services/fauna'
 import {query as q} from 'faunadb'
-import { getSession } from "next-auth/react"
+import {getSession} from "next-auth/react"
 
 type User = {
   ref: {
@@ -19,7 +19,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     return res.status(405).end('Method not allowed.')
   }
 
-  const session = await getSession({ req })
+  const session = await getSession({req})
 
   const {email} = session.user
 
@@ -31,9 +31,9 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       )
     )
   )
-  
+
   let customerId = user.data.stripe_customer_id
-  
+
   if (!customerId) {
     const stripeCustomer = await stripe.customers.create({
       email,
@@ -61,9 +61,9 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     payment_method_types: ['card'],
     billing_address_collection: 'required',
     line_items: [
-      {  
-         price: 'price_1IrtxKJWc3Xai84Vi6KJW2DO',
-         quantity: 1
+      {
+        price: 'price_1IrtxKJWc3Xai84Vi6KJW2DO',
+        quantity: 1
       }
     ],
     mode: 'subscription',
@@ -72,5 +72,5 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     cancel_url: process.env.STRIPE_CANCEL_URL
   })
 
-  return res.status(200).json({ sessionId: stripeCheckoutSession.id })
+  return res.status(200).json({sessionId: stripeCheckoutSession.id})
 }
